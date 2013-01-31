@@ -1,0 +1,10 @@
+## build files, libraries and creds that should not be in repo
+
+src/AwsCredentials.properties
+WebContent/WEB-INF/lib/*
+WebContent/WEB-INF/classes/*
+.classpath  
+.project    
+.settings
+target
+
