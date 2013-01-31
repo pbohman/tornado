@@ -30,7 +30,7 @@
             <resource>
                 <directory>src</directory>
                 <includes>
-                    <include>AwsCredentials.properties</include>
+                    <include>*.properties</include>
                 </includes>
             </resource>
         </resources>
