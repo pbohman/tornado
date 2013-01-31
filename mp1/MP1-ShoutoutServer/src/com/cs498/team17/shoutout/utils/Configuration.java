@@ -37,7 +37,6 @@ public class Configuration {
     private Properties awsProperties = new Properties();
 
     private static final String AWS_CREDENTIALS_PROPERTIES = "/AwsCredentials.properties";
-    private static final String SIMPLE_JPA_PROPERTY_PATH = "/simplejpa.properties";
     private static final String ENDPOINTS_PROPERTY_PATH = "/endpoints.properties";
     private static final String BUCKET_PROPERTY_PATH = "/s3-bucket.properties";
 

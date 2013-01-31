@@ -100,10 +100,11 @@ public class S3StorageManager {
 	 */
 	public void store(StorageObject obj, boolean reducedRedundancy, CannedAccessControlList acl) {
 		ObjectMetadata omd = new ObjectMetadata();
+		byte [] data = obj.getData();
 		omd.setContentType(obj.getMimeType());
-		omd.setContentLength(obj.getData().length);
+		omd.setContentLength(data.length);
 
-		ByteArrayInputStream is = new ByteArrayInputStream(obj.getData());
+		ByteArrayInputStream is = new ByteArrayInputStream(data);
 		PutObjectRequest request = new PutObjectRequest(obj.getBucketName(), obj.getStoragePath(), is, omd);
 
 		// Check if reduced redundancy is enabled
