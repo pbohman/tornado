@@ -245,12 +245,12 @@ public class S3StorageManager {
 
 	public static String getKey () {
 		Configuration config = Configuration.getInstance();
-		return config.getProperty("accessKey");
+		return config.getAWSCredential("accessKey");
 	}
 
 	public static String getSecret () {
 		Configuration config = Configuration.getInstance();
-		return config.getProperty("secretKey");
+		return config.getAWSCredential("secretKey");
 	}
 
 }

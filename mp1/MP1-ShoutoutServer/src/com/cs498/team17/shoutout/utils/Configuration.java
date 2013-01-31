@@ -32,9 +32,9 @@ public class Configuration {
     public static final String BUCKET_KEY = "bucket";
     public static final String SHOUTOUT_PATH_KEY = "shoutout-path";
     
-    private Properties simpleJpaProperties = new Properties();
     private Properties endpoints = new Properties();
     private Properties bucketProperties = new Properties();
+    private Properties awsProperties = new Properties();
 
     private static final String AWS_CREDENTIALS_PROPERTIES = "/AwsCredentials.properties";
     private static final String SIMPLE_JPA_PROPERTY_PATH = "/simplejpa.properties";
@@ -45,8 +45,7 @@ public class Configuration {
 
     private Configuration() {
         try {
-            simpleJpaProperties.load(this.getClass().getResourceAsStream(SIMPLE_JPA_PROPERTY_PATH));
-            simpleJpaProperties.load(this.getClass().getResourceAsStream(AWS_CREDENTIALS_PROPERTIES));
+            awsProperties.load(this.getClass().getResourceAsStream(AWS_CREDENTIALS_PROPERTIES));
             endpoints.load(this.getClass().getResourceAsStream(ENDPOINTS_PROPERTY_PATH));
             bucketProperties.load(this.getClass().getResourceAsStream(BUCKET_PROPERTY_PATH));           
         } catch ( Exception e ) {
@@ -56,10 +55,6 @@ public class Configuration {
 
     public static final Configuration getInstance () {
         return configuration;
-    }
-
-    public String getProperty (String propertyName) {
-        return simpleJpaProperties.getProperty(propertyName);
     }
     
     /**
@@ -71,6 +66,10 @@ public class Configuration {
      */
     public String getServiceEndpoint(String service) {
         return endpoints.getProperty(service);
+    }
+    
+    public String getAWSCredential(String key){
+    	return awsProperties.getProperty(key);
     }
     
     /**
