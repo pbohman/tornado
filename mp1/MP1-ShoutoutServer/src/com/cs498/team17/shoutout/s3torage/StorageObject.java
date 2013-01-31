@@ -14,18 +14,22 @@
  */
 package com.cs498.team17.shoutout.s3torage;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutput;
+import java.io.ObjectOutputStream;
+
 /**
  * This is a general purpose object used for storing data on S3.
  * The mimeType and data variables need only be set if you are
  * planning to initiate a storage call.  If you do not specify a
  * mimeType "text/html" is the default.
  */
-public class StorageObject {
+public abstract class StorageObject {
 
 	private String bucketName;
-	private byte [] data;
 	private String storagePath;
-	private String mimeType="text/html";
+	private String mimeType="application/octet-stream ";
 
 	public void setBucketName(String bucketName) {
 		/**
@@ -36,17 +40,24 @@ public class StorageObject {
 		//this.bucketName = bucketName.toLowerCase();
 		this.bucketName = bucketName;
 	}
+	
 
 	public String getBucketName() {
 		return bucketName;
 	}
 
 	public byte[] getData() {
-		return data;
-	}
-
-	public void setData(byte[] data) {
-		this.data=data;
+		ByteArrayOutputStream bos = new ByteArrayOutputStream();
+		ObjectOutput out;
+		try {
+			out = new ObjectOutputStream(bos);
+			out.writeObject(this);
+			return bos.toByteArray();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		return null;
 	}
 
 	public String getStoragePath() {

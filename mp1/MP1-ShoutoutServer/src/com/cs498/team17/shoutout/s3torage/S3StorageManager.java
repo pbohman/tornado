@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -160,7 +161,39 @@ public class S3StorageManager {
 		return is;
 	}
 
+	private class ObjInputStreamIter implements Iterator<InputStream> {
 
+		
+		private List<S3ObjectSummary> summaries;
+		private String bucketName;
+		
+		public ObjInputStreamIter(String bucketName) {
+			this.bucketName = bucketName;
+			ObjectListing objectList = s3Client.listObjects(bucketName);
+			summaries = objectList.getObjectSummaries();
+		}
+		
+		public boolean hasNext() {
+			return summaries.size() > 0;
+		}
+
+		public InputStream next() {
+	    	S3ObjectSummary summary = summaries.get(0);
+	    	summaries.remove(0);
+	    	S3Object obj  = s3Client.getObject(bucketName, summary.getKey());
+	        return obj.getObjectContent();
+		}
+
+		public void remove() {
+			// TODO Auto-generated method stub
+			
+		}
+		
+		
+	}
+	public ObjInputStreamIter getObjects(String bucketName){
+		return new ObjInputStreamIter(bucketName);
+	}
 
 	/**
 	 * Deletes the specified S3 object from the S3 storage service.  If a

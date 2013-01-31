@@ -1,12 +1,18 @@
 package com.cs498.team17.shoutout.s3torage;
 
 import com.cs498.team17.shoutout.utils.Configuration;
-import java.sql.Timestamp;
-import java.util.Date;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Random;
 
-public class Shoutout extends StorageObject {
-	
+public class Shoutout extends StorageObject implements java.io.Serializable {
+
+	private static final long serialVersionUID = 1L;
 	private String message;
 	private String user;
 	private static final String stgBucketID = Configuration.getInstance().getBucketProperty(Configuration.BUCKET_KEY);
@@ -19,10 +25,18 @@ public class Shoutout extends StorageObject {
 		this.user = user;
 		
 		super.setBucketName(stgBucketID);
-		String ts = new Timestamp(new Date().getTime()).toString();
-		String id = Integer.toString(randomGenerator.nextInt()) + message;
-		super.setStoragePath(stgBasePath + "/" + user + "/" + ts + "_" + Integer.toString(randomGenerator.nextInt()));
-		super.setData(message.getBytes());	
+		super.setStoragePath("");
+	}
+	
+	public static List<Shoutout> fromS3(S3StorageManager s3Manager) throws IOException, ClassNotFoundException{
+		List<Shoutout> shoutouts = new ArrayList<Shoutout>();
+		Iterator<InputStream> streams = s3Manager.getObjects(stgBucketID);
+		while(streams.hasNext()){
+			InputStream stream = streams.next();
+			ObjectInputStream in = new ObjectInputStream(stream);
+			shoutouts.add((Shoutout)in.readObject());
+		}
+		return shoutouts;
 	}
 
 	public String getMessage() {
@@ -40,6 +54,5 @@ public class Shoutout extends StorageObject {
 	public void setUser(String user) {
 		this.user = user;
 	}
-	
 
 }

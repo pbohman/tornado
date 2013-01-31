@@ -1,5 +1,6 @@
 package com.cs498.team17.shoutout.web;
 
+import java.util.List;
 import java.util.logging.Logger;
 import java.io.*;
 import javax.servlet.http.*;
@@ -34,13 +35,21 @@ public class ShoutoutController extends HttpServlet{
     public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException{
     	resp.setContentType("text/html");
         PrintWriter out = resp.getWriter();
-
-        String name = req.getParameter("name");
-        out.println("<HTML>");
-        out.println("<HEAD><TITLE>Hello, " + name + "</TITLE></HEAD>");
-        out.println("<BODY>");
-        out.println("Hello, " + name);
+        out.println("<BODY><HTML>");
+        
+        try {
+			List<Shoutout> shoutouts = Shoutout.fromS3(storageMgr);
+			out.println("<ul>");
+	        for (Shoutout shoutout : shoutouts) {
+	        	out.println("<li>" + shoutout.getUser() + ": " + shoutout.getMessage());
+	        }
+	        out.println("</ul>");
+	        
+        } catch (ClassNotFoundException e) {
+				e.printStackTrace();
+        }
         out.println("</BODY></HTML>");
+        
     }
 	
 }
