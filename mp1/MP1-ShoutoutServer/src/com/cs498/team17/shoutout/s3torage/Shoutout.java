@@ -9,6 +9,9 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
+import java.util.Random;
+import java.util.Date;
+import java.sql.Timestamp;
 
 public class Shoutout extends StorageObject implements java.io.Serializable {
 
@@ -18,14 +21,17 @@ public class Shoutout extends StorageObject implements java.io.Serializable {
 	private static final String stgBucketID = Configuration.getInstance().getBucketProperty(Configuration.BUCKET_KEY);
 	private static final String stgBasePath = Configuration.getInstance().getBucketProperty(Configuration.SHOUTOUT_PATH_KEY);
 	private static final Random randomGenerator = new Random();
-	
+
 	public Shoutout(String message, String user) {
 		
 		this.message = message;
 		this.user = user;
 		
 		super.setBucketName(stgBucketID);
-		super.setStoragePath("");
+		
+		java.util.Date date= new java.util.Date();
+		Timestamp ts = new Timestamp(date.getTime());
+		super.setStoragePath(ts + Integer.toString(randomGenerator.nextInt()) );
 	}
 	
 	public static List<Shoutout> fromS3(S3StorageManager s3Manager) throws IOException, ClassNotFoundException{
