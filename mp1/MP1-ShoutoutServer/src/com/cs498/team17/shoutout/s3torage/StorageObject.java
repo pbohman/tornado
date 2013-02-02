@@ -37,8 +37,8 @@ public abstract class StorageObject {
 		 * create buckets with different cases, it will error out when
 		 * being passed through the AWS SDK due to stricter checking.
 		 */
-		this.bucketName = bucketName.toLowerCase();
-		//this.bucketName = bucketName;
+		//this.bucketName = bucketName.toLowerCase();
+		this.bucketName = bucketName;
 	}
 	
 
