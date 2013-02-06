@@ -1,0 +1,7 @@
+## build files, libraries and creds that should not be in repo
+
+.classpath  
+.project    
+.settings
+target
+
