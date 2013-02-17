@@ -55,11 +55,11 @@ public class GalaxyAverage {
 					continue;
 				}
 				
-				measureNum.set(Integer.parseInt(tokenizer.nextToken()));
-				while (tokenizer.hasMoreTokens()) {
-					word.set(tokenizer.nextToken());
-					output.collect(word, measureNum);
-				}
+				measureNum.set(Integer.parseInt(token));
+
+				word.set(galaxy + "_" + measure);
+				output.collect(word, measureNum);
+				
 			}
 		}
 	}	
