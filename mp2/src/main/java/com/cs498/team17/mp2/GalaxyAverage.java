@@ -83,7 +83,7 @@ public class GalaxyAverage {
 	}
 	
 	public static void main(String[] args) throws Exception {
-		JobConf conf = new JobConf(WordCount.class);
+		JobConf conf = new JobConf(GalaxyAverage.class);
 		conf.setJobName("mp2-team17-GalaxyAverage");
 		
 		// Output = [word: filenum-occurrence, ...]

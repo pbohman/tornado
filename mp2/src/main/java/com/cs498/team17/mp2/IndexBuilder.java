@@ -50,7 +50,7 @@ public class IndexBuilder {
 	}
 	
 	public static void main(String[] args) throws Exception {
-		JobConf conf = new JobConf(WordCount.class);
+		JobConf conf = new JobConf(IndexBuilder.class);
 		conf.setJobName("mp2-team17-indexbuilder");
 		
 		// Output = [word: filenum-occurrence, ...]
