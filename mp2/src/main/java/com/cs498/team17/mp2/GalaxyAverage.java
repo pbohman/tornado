@@ -37,11 +37,11 @@ public class GalaxyAverage {
 						|| token.startsWith("rotation")
 						)
 				{
-					tag = "_avg" + token;
+					tag = String.format("%s %s%11s", galaxy, "avg", token);
 				}
 				else
 				{
-					output.collect(new Text(galaxy + tag),
+					output.collect(new Text(tag),
 							new FloatWritable(Float.parseFloat(token)));
 				}
 				
