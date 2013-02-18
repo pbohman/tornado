@@ -14,69 +14,56 @@ import org.apache.hadoop.mapred.*;
 
 
 public class GalaxyAverage {
-	public static class Map extends MapReduceBase implements Mapper<LongWritable, Text, Text, IntWritable> {
+	public static class Map extends MapReduceBase implements Mapper<LongWritable, Text, Text, FloatWritable> {
 		private Text word = new Text();
-		private IntWritable measureNum = new IntWritable();
-		public void map(LongWritable key, Text value, OutputCollector<Text, IntWritable> output, Reporter reporter) 
+		private FloatWritable measureNum = new FloatWritable();
+		public void map(LongWritable key, Text value, OutputCollector<Text, FloatWritable> output, Reporter reporter) 
 				throws IOException 
 		{
-			String line = value.toString();
-			StringTokenizer tokenizer = new StringTokenizer(line);
-			String token = "";
-			String galaxy = "";
-			String measure = "";
 			
+			String galaxy = "";
+
+			StringTokenizer tokenizer = new StringTokenizer(value.toString());
+
 			while (tokenizer.hasMoreTokens()) 
 			{
-				token = tokenizer.nextToken();
-				if (token.contentEquals("galaxy:"))
+				String token = tokenizer.nextToken();
+				if (token.startsWith("galaxy"))
 				{
-					galaxy = tokenizer.nextToken();
-					continue;
+					galaxy = tokenizer.nextToken().trim();
 				}
-				if (token.contentEquals("mass:"))
+				else if (token.startsWith("mass") 
+						|| token.startsWith("distance")
+						|| token.startsWith("diameter")
+						|| token.startsWith("rotation")
+						)
 				{
-					measure = "avgmass";
-					continue;
+					word.set(galaxy + "_avg" + token);
 				}
-				if (token.contentEquals("distance:"))
+				else
 				{
-					measure = "avgdistance";
-					continue;
+					measureNum.set(Float.parseFloat(token));
+	
+					output.collect(word, measureNum);
 				}
-				if (token.contentEquals("diameter:"))
-				{
-					measure = "avgdiameter";
-					continue;
-				}
-				if (token.contentEquals("rotation:"))
-				{
-					measure = "avgrotation";
-					continue;
-				}
-				
-				measureNum.set(Integer.parseInt(token));
-
-				word.set(galaxy + "_" + measure);
-				output.collect(word, measureNum);
 				
 			}
 		}
 	}	
 
-	public static class Reduce extends MapReduceBase implements Reducer <Text, IntWritable, Text, IntWritable> {
+	public static class Reduce extends MapReduceBase implements Reducer <Text, FloatWritable, Text, FloatWritable> {
 		
-		public void reduce(Text key, Iterator<IntWritable> values, OutputCollector<Text, IntWritable> output, Reporter reporter)
+		public void reduce(Text key, Iterator<FloatWritable> values, OutputCollector<Text, FloatWritable> output, Reporter reporter)
 				throws IOException{
-			int sum = 0;
-			int count = 0;
+			float sum = 0;
+			float count = 0;
 			
 			while (values.hasNext()){
 				sum += values.next().get();
 				count++;
 			}
 			
-			output.collect(key, new IntWritable(sum/count));
+			output.collect(key, new FloatWritable(sum/count));
 		}
 
 
@@ -88,10 +75,10 @@ public class GalaxyAverage {
 		
 		// Output = [word: filenum-occurrence, ...]
 		conf.setMapOutputKeyClass(Text.class);
-		conf.setMapOutputValueClass(IntWritable.class);
+		conf.setMapOutputValueClass(FloatWritable.class);
 		
 		conf.setOutputKeyClass(Text.class);
-		conf.setOutputValueClass(IntWritable.class);
+		conf.setOutputValueClass(FloatWritable.class);
 		
 		conf.setMapperClass(Map.class);
 		//conf.setCombinerClass(Reduce.class);

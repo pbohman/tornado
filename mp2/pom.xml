@@ -32,7 +32,6 @@
           <archive>
             <manifest>
               <addClasspath>true</addClasspath>
-              <mainClass>com.cs498.team17.mp2.WordCount</mainClass>
             </manifest>
           </archive>
         </configuration>
