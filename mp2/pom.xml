@@ -3,12 +3,19 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>com.cs498.team17.mp2</groupId>
-  <artifactId>team17-mp2</artifactId>
+  <artifactId>MP2-Parent</artifactId>
   <version>1.0</version>
-  <packaging>jar</packaging>
+  <packaging>pom</packaging>
 
-  <name>team17-mp2</name>
+  <name>MP2-Parent</name>
   <url>http://maven.apache.org</url>
+
+
+  <modules>
+    <module>src/main/java/com/cs498/team17/mp2/WordCount</module>
+    <module>src/main/java/com/cs498/team17/mp2/IndexBuilder</module>
+    <module>src/main/java/com/cs498/team17/mp2/GalaxyAverage</module>
+  </modules>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

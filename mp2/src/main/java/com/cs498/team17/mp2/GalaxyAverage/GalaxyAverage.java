@@ -1,4 +1,4 @@
-package com.cs498.team17.mp2;
+package com.cs498.team17.mp2.GalaxyAverage;
 
 import java.io.IOException;
 import java.util.Dictionary;

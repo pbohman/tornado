@@ -1,4 +1,4 @@
-package com.cs498.team17.mp2;
+package com.cs498.team17.mp2.WordCount;
 
 import java.io.IOException;
 import java.util.Iterator;
@@ -9,6 +9,9 @@ import org.apache.hadoop.conf.*;
 import org.apache.hadoop.io.*;
 import org.apache.hadoop.util.*;
 import org.apache.hadoop.mapred.*;
+
+import com.cs498.team17.mp2.IndexBuilder.IndexBuilder.Map;
+import com.cs498.team17.mp2.IndexBuilder.IndexBuilder.Reduce;
 
 
 public class WordCount {
@@ -40,6 +43,8 @@ public class WordCount {
 	}
 	
 	public static void main(String[] args) throws Exception {
+		
+		
 		JobConf conf = new JobConf(WordCount.class);
 		conf.setJobName("mp2-team17-wordcount");
 		
@@ -48,7 +53,6 @@ public class WordCount {
 		conf.setOutputValueClass(IntWritable.class);
 		
 		conf.setMapperClass(Map.class);
-		conf.setCombinerClass(Reduce.class);
 		conf.setReducerClass(Reduce.class);
 		
 		conf.setInputFormat(TextInputFormat.class);
