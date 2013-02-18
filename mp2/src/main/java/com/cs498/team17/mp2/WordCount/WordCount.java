@@ -10,8 +10,6 @@ import org.apache.hadoop.io.*;
 import org.apache.hadoop.util.*;
 import org.apache.hadoop.mapred.*;
 
-import com.cs498.team17.mp2.IndexBuilder.IndexBuilder.Map;
-import com.cs498.team17.mp2.IndexBuilder.IndexBuilder.Reduce;
 
 
 public class WordCount {
