@@ -15,13 +15,12 @@ import org.apache.hadoop.mapred.*;
 
 public class GalaxyAverage {
 	public static class Map extends MapReduceBase implements Mapper<LongWritable, Text, Text, FloatWritable> {
-		private Text word = new Text();
-		private FloatWritable measureNum = new FloatWritable();
 		public void map(LongWritable key, Text value, OutputCollector<Text, FloatWritable> output, Reporter reporter) 
 				throws IOException 
 		{
 			
 			String galaxy = "";
+			String tag = "";
 
 			StringTokenizer tokenizer = new StringTokenizer(value.toString());
 
@@ -38,13 +37,12 @@ public class GalaxyAverage {
 						|| token.startsWith("rotation")
 						)
 				{
-					word.set(galaxy + "_avg" + token);
+					tag = "_avg" + token;
 				}
 				else
 				{
-					measureNum.set(Float.parseFloat(token));
-	
-					output.collect(word, measureNum);
+					output.collect(new Text(galaxy + tag),
+							new FloatWritable(Float.parseFloat(token)));
 				}
 				
 			}
