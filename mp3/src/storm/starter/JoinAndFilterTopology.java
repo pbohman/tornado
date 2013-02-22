@@ -14,7 +14,8 @@ import java.util.Random;
 
 public class JoinAndFilterTopology {
 	
-	private static final int TWO_SECONDS = 2;
+	private static final int TWO = 2;
+	private static final int FIVE = 5;
 	
     public static void main(String[] args) {
     	
@@ -36,18 +37,18 @@ public class JoinAndFilterTopology {
         builder.setBolt("filter", new FilterBolt()).shuffleGrouping("join");
         
         // Add another bolt to keep count of total likes and retweets per message
-        
+        builder.setBolt("count", new CountingBolt(), 3).fieldsGrouping("filter", new Fields("geo_location")); 
+        builder.setBolt("total", new TotalingBolt(), 1).globalGrouping("count");
         
         // PrinterBolt finally prints out the end result to System.out
         // This assumes that the bolt that feeds into it was named "filter",
         // change as per your topology.
         
-        builder.setBolt("print", new PrinterBolt()).shuffleGrouping("filter");
-        
-        
+        builder.setBolt("print", new PrinterBolt(), 1).globalGrouping("total");
+       
         
         Config conf = new Config();
-        conf.put(Config.TOPOLOGY_TICK_TUPLE_FREQ_SECS, TWO_SECONDS);
+        conf.put(Config.TOPOLOGY_TICK_TUPLE_FREQ_SECS, FIVE);
         //conf.setDebug(true);
         
         LocalCluster cluster = new LocalCluster();

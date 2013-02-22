@@ -18,6 +18,9 @@ public class FilterBolt extends BaseBasicBolt{
 		if(input.getInteger(1) > 4){
 			collector.emit(input.getValues());
 		}
+		else{
+			collector.emit(input.getValues());
+		}
 	}
 
 	@Override

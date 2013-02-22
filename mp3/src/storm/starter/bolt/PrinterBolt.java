@@ -12,9 +12,10 @@ public class PrinterBolt extends BaseBasicBolt {
     @Override
     public void execute(Tuple tuple, BasicOutputCollector collector) {
 		if (TupleHelpers.isTickTuple(tuple)) {
+			System.out.println();
 			return;
 		}
-        System.out.println(tuple);
+        System.out.println("OUTPUT TUPLE:" + tuple);
     }
 
     @Override

@@ -10,43 +10,40 @@ import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseBasicBolt;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
-
-
+import backtype.storm.tuple.Values;
 
 public class CountingBolt extends BaseBasicBolt {
-	private Map<String, Integer> counts = new HashMap<String, Integer>();
-	private int total = 0;
-	private static int TWO_SECONDS = 2;
-	
-	@Override
-	public void execute(Tuple input, BasicOutputCollector collector) {
-		
-        if (TupleHelpers.isTickTuple(input)) {
-            emitRankings(collector);
+        private Map<String, Integer> counts = new HashMap<String, Integer>();
+        
+        @Override
+        public void execute(Tuple input, BasicOutputCollector collector) {
+                
+			if (TupleHelpers.isTickTuple(input)) {
+				emitCounts(collector);
+			}
+			else {
+				String region = input.getString(3);
+				Integer count = counts.get(region);
+				if(count==null) count = 0;
+				count = count + input.getInteger(1) + input.getInteger(2);
+				counts.put(region, count);
+				
+				//collector.ack(tuple);
+			}
         }
-        else {
-            String region = input.getString(3);
-            Integer count = counts.get(region);
-            if(count==null) count = 0;
-            count = count + input.getInteger(1) + input.getInteger(2);
-            total = total + input.getInteger(1) + input.getInteger(2);
-            counts.put(region, count);
+        
+        private void emitCounts(BasicOutputCollector collector){
+                Iterator it = counts.entrySet().iterator();
+				while (it.hasNext()) {
+					Map.Entry pairs = (Map.Entry)it.next();
+					collector.emit(new Values((String) pairs.getKey(),  pairs.getValue()));
+					it.remove();
+				}
         }
-	}
-	
-	private void emitRankings(BasicOutputCollector collector){
-		Iterator it = counts.entrySet().iterator();
-		while (it.hasNext()) {
-			
-			Map.Entry pairs = (Map.Entry)it.next();
-//			collector.emit(new Values((String) pairs.getKey(), (float) pairs.getValue()/total) * 100.0);
-
-		}
-	}
 
     @Override
     public void declareOutputFields(OutputFieldsDeclarer declarer) {
-        declarer.declare(new Fields("region", "percentage"));
+        declarer.declare(new Fields("region", "count"));
     }
 
 }
