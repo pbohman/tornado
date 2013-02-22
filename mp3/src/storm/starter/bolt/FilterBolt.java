@@ -1,5 +1,6 @@
 package storm.starter.bolt;
 
+import storm.starter.util.TupleHelpers;
 import backtype.storm.topology.BasicOutputCollector;
 import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseBasicBolt;
@@ -10,6 +11,9 @@ public class FilterBolt extends BaseBasicBolt{
 
 	@Override
 	public void execute(Tuple input, BasicOutputCollector collector) {
+		if (TupleHelpers.isTickTuple(input)) {
+			return;
+		}
 		
 		if(input.getInteger(1) > 4){
 			collector.emit(input.getValues());

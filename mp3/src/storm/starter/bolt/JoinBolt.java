@@ -16,6 +16,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import storm.starter.util.TupleHelpers;
+
 public class JoinBolt extends BaseRichBolt {
     OutputCollector _collector;
     Fields _idFields;
@@ -59,6 +61,10 @@ public class JoinBolt extends BaseRichBolt {
 
     @Override
     public void execute(Tuple tuple) {
+		if (TupleHelpers.isTickTuple(tuple)) {
+			return;
+		}
+		
         List<Object> id = tuple.select(_idFields);
         GlobalStreamId streamId = new GlobalStreamId(tuple.getSourceComponent(), tuple.getSourceStreamId());
         if(!_pending.containsKey(id)) {
