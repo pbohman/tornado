@@ -1,3 +1,5 @@
+package com.cs498.team17.mp2.GalaxyAverage;
+
 
 import java.io.IOException;
 import java.util.Dictionary;
@@ -22,28 +24,67 @@ public class GalaxyAverage {
 			
 			String galaxy = "";
 			String tag = "";
+			float avgMass = 0;
+			float avgDistance = 0;
+			float avgDiameter = 0;
+			float avgRotation = 0;
+			
+			float sum = 0;
+			float count = 0;
 
 			StringTokenizer tokenizer = new StringTokenizer(value.toString());
+			String metric = "";
 
 			while (tokenizer.hasMoreTokens()) 
 			{
 				String token = tokenizer.nextToken();
 				if (token.startsWith("galaxy"))
 				{
-					galaxy = tokenizer.nextToken().trim();
-				}
-
-				else
-				{
-					output.collect(	new Text(galaxy),
-									new Text(value.toString())
-									);
+					
+					galaxy = tokenizer.nextToken();
 					continue;
 				}
 				
+				else if (token.startsWith("mass") || token.startsWith("distance") || token.startsWith("diameter") || token.startsWith("rotation")
+					)
+				{
+
+					if (metric.startsWith("mass"))
+						avgMass = sum/count;
+					else if (metric.startsWith("distance"))
+						avgDistance = sum/count;
+					else if (metric.startsWith("diameter"))
+						avgDiameter = sum/count;
+					else if (metric.startsWith("rotation"))
+						avgRotation = sum/count;
+					
+					sum = 0;
+					count = 0;
+					metric = token.replaceAll(":", "");
+					continue;
+				}
+				
+				sum += Float.parseFloat(token);
+				count++;
 			}
+			
+			if(metric.equals("mass")){
+				avgMass = sum/count;
+			}
+			else if(metric.equals("distance")){
+				avgDistance = sum/count;
+			}
+			else if(metric.equals("diameter")){
+				avgDiameter = sum/count;
+			}
+			else if(metric.equals("rotation")){
+				avgRotation = sum/count;
+			}
+			
+			StringBuilder outValue = new StringBuilder("massavg: " + avgMass + " distanceavg: " + avgDistance + " diameteravg: " + avgDiameter +"rotationavg: " + avgRotation); 
+			output.collect( new Text(galaxy), new Text(outValue.toString()));
 		}
-	}	
+	}
 
 	public static class Reduce extends MapReduceBase implements Reducer <Text, Text, Text, Text> {
 		
@@ -57,50 +98,8 @@ public class GalaxyAverage {
 			float sum = 0;
 			float count = 0;
 			String metric = "";
-			
-			while (values.hasNext()){
-				StringTokenizer tokenizer = new StringTokenizer(values.next().toString());
-
-				while (tokenizer.hasMoreTokens()) 
-				{
-					String token = tokenizer.nextToken();
-					if (token.startsWith("galaxy"))
-					{
-						tokenizer.nextToken();
-						continue;
-					}
-					
-					else if (token.startsWith("mass") || token.startsWith("distance") || token.startsWith("diameter") || token.startsWith("rotation")
-						)
-					{
-
-						if (metric.startsWith("mass"))
-							avgMass = sum/count;
-						else if (metric.startsWith("distance"))
-							avgDistance = sum/count;
-						else if (metric.startsWith("diameter"))
-							avgDiameter = sum/count;
-						else if (metric.startsWith("rotation"))
-							avgRotation = sum/count;
-						
-						sum = 0;
-						count = 0;
-						metric = token.replaceAll(":", "");
-						continue;
-					}
-					
-					sum += Float.parseFloat(token);
-					count++;
-				}
-			}
-			
-			String outKey = String.format("%s %s ", "galaxy:", key.toString());
-			String outValue = String.format("massavg: %s distanceavg: %s diameteravg: %s rotationavg: %s", 
-					avgMass, avgDistance, avgDiameter, avgRotation);
-				
-			output.collect(new Text(outKey), new Text(outValue));
+			output.collect(new Text(key), new Text(values.next()));
 		}
-
 	}
 	
 	
