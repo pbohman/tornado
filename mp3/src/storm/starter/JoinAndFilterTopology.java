@@ -13,6 +13,9 @@ import storm.starter.bolt.*;
 import java.util.Random;
 
 public class JoinAndFilterTopology {
+	
+	private static final int TWO_SECONDS = 2;
+	
     public static void main(String[] args) {
     	
         FeederSpout facebookSpout = new FeederSpout(new Fields("id", "likes", "geo_location"));
@@ -28,7 +31,9 @@ public class JoinAndFilterTopology {
         builder.setBolt("join", new JoinBolt(new Fields("id", "retweets", "likes", "geo_location")))
                 .fieldsGrouping("facebook", new Fields("id"))
                 .fieldsGrouping("twitter", new Fields("id"));
+        
         // Add a filter bolt to your topology to filter out any message that has retweets less than 4 or likes less than 8. 
+        builder.setBolt("filter", new FilterBolt()).shuffleGrouping("join");
         
         // Add another bolt to keep count of total likes and retweets per message
         
@@ -42,7 +47,8 @@ public class JoinAndFilterTopology {
         
         
         Config conf = new Config();
-        conf.setDebug(true);
+        conf.put(Config.TOPOLOGY_TICK_TUPLE_FREQ_SECS, TWO_SECONDS);
+        //conf.setDebug(true);
         
         LocalCluster cluster = new LocalCluster();
         cluster.submitTopology("join-and-filter-example", conf, builder.createTopology());
