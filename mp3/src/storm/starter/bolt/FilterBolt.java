@@ -6,6 +6,7 @@ import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseBasicBolt;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
+import backtype.storm.tuple.Values;
 
 public class FilterBolt extends BaseBasicBolt{
 
@@ -16,11 +17,11 @@ public class FilterBolt extends BaseBasicBolt{
 		}
 		
 		if(input.getInteger(1) > 4){
-			collector.emit(input.getValues());
+			if (input.size() >= 4){
+				collector.emit(new Values(input.getInteger(0), input.getInteger(1), input.getInteger(2), input.getString(3)));
+			}
 		}
-		else{
-			collector.emit(input.getValues());
-		}
+
 	}
 
 	@Override

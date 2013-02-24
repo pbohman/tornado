@@ -11,15 +11,26 @@ import backtype.storm.topology.base.BaseBasicBolt;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 import backtype.storm.tuple.Values;
+import backtype.storm.task.OutputCollector;
+import backtype.storm.task.TopologyContext;
+import backtype.storm.topology.base.BaseRichBolt;
 
-public class TotalingBolt extends BaseBasicBolt {
+public class TotalingBolt extends BaseRichBolt {
         private Map<String, Integer> counts = new HashMap<String, Integer>();
         private int total = 0;
         
+        private OutputCollector _collector;
+
         @Override
-        public void execute(Tuple input, BasicOutputCollector collector) {
+        public void prepare(Map conf, TopologyContext context, OutputCollector collector) {
+            _collector = collector;
+        }
+        
+        @Override
+        public void execute(Tuple input) {
 			if (TupleHelpers.isTickTuple(input)) {
-				emitRankings(collector);
+				emitRankings(_collector);
+				_collector.ack(input);
 				return;
 			}
 			
@@ -29,11 +40,12 @@ public class TotalingBolt extends BaseBasicBolt {
             count = count + input.getInteger(1);
             total = total + input.getInteger(1);
             counts.put(region, count);
+            _collector.ack(input);
             
             //System.out.println("DEBUG TUPLE:" + input + " region:" + region + " count:" + count);            
         }
         
-        private void emitRankings(BasicOutputCollector collector){
+        private void emitRankings(OutputCollector collector){
                 Iterator it = counts.entrySet().iterator();
                 while (it.hasNext()) {
                 	Map.Entry pairs = (Map.Entry)it.next();
