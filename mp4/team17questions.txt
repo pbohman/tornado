@@ -1,0 +1,24 @@
+1. Is Hive better suited for OLTP workloads or batch jobs? (3pts)
+
+Hive is better suited towards batch jobs. In the background it runs batch based map/reduce jobs. In fact, Hive doesn't support transactions.
+( http://en.wikipedia.org/wiki/Apache_Hive)
+
+2. What are Partitions and Buckets in Hive? (3pts)
+
+- Partitions allow the data within a table to be split across multiple directories. For example, a table can be partitioned by a column corresponding to a date. With this partitioning scheme, the data for each date (3-17-2013) will be stored in its own directory (/hdfs/hive_db/data/3-17-2013/). Because the partition value is stored in the directory path and not the actual files, the partitition columns are also known as virtual columns(1).
+
+- Buckets allow column values within a partition to be hashed into buckets. For example, a column 'likes' may be partitioned by userid. All of the likes from a given userid can quickly be found by hashing the userid.
+
+Note that it is not necessary for tables to be partitioned or bucketed, but these abstractions allow the system to prune large quantities of data during query processing, resulting in faster query execution.
+ 
+(https://cwiki.apache.org/Hive/tutorial.html)
+
+3. Describe how the MetaStore in Hive works. (3pts)
+The metastore is a relational database that stores all of the hive metadata. The metadate includes all of the configuration and state information used by hive to store the user's data and report statistics. Table names, partition keys, bucketed columns, database privileges, stats, and hdfs locations are all stored in the meta store. 
+
+How does the MetaStore work in Hive?  Its built on relational calculus which has been around forever. Derby, an embedded java relational database implementation is often used. The metastore is used to locate data within hdfs. For example, a query selecting all likes for a userid would use the metastore to lookup where the userid bucket of likes is stored (if the likes are bucketed based on userid)
+
+4. What is the idea behind Map Join optimization in Hive? (3pts)
+The idea behind the 'Map Join Optimization' is to avoid the cost of file io between the map and reduce tasks during a join operation. Without the optimization, the mapper task emits the table, the table is written to disk and sorted during the shuffle phase. The reducer then reads in the intermediate files representing the tables to be joined and performs the join operation. The goal of this optimization is to do the join operation in the map task to avoid writing the intermediate results. This optimization only applies to smaller tables that can fit in the mapper memory.
+
+
