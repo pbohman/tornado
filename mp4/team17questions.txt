@@ -1,3 +1,9 @@
+================================
+================================
+HIVE
+================================
+
+
 1. Is Hive better suited for OLTP workloads or batch jobs? (3pts)
 
 Hive is better suited towards batch jobs. In the background it runs batch based map/reduce jobs. In fact, Hive doesn't support transactions.
@@ -21,4 +27,52 @@ How does the MetaStore work in Hive?  Its built on relational calculus which has
 4. What is the idea behind Map Join optimization in Hive? (3pts)
 The idea behind the 'Map Join Optimization' is to avoid the cost of file io between the map and reduce tasks during a join operation. Without the optimization, the mapper task emits the table, the table is written to disk and sorted during the shuffle phase. The reducer then reads in the intermediate files representing the tables to be joined and performs the join operation. The goal of this optimization is to do the join operation in the map task to avoid writing the intermediate results. This optimization only applies to smaller tables that can fit in the mapper memory.
 
+
+================================
+================================
+HBASE
+================================
+
+1. How are rows sorted in HBase? (1pt)
+
+Habase stores data in rows and columns. A cell is an intersection of a row and column. Data in a cell is represented as an uninterpreted byte array (i.e. long, serialized object, etc). Rows are sorted in lexigraphical byte-order via the specified row-key.
+
+(http://hbase.apache.org/book/datamodel.html)
+(http://hbase.apache.org/book/row.html)
+
+2. When do column families need to be declared? (1pt)
+
+Column families provide a way to group columns within a table. For example, a 'BMI' column family could contain two columns: 'BMI:weight' and 'BMI:Height'. Habase tuning is applied to column families. So, in order to tune Hbase, column families must be defined. Note: it is important to create column from columns that have similar access patterns.
+
+(http://hbase.apache.org/book/columnfamily.html)
+
+3. Describe how HBase handles deletes? (3pts)
+
+HBase does not modify data in place due to the underlying append only filesystemm hdfs. Instead, when a row is deleted it is marked as a tombstone and is not returned in subsequent result sets. Tombstones are removed during major compactions. Compactions are basically a process that rewrites the current database (minus tombstones). 
+
+(http://hbase.apache.org/book/data_model_operations.html#delete)
+(http://hbase.apache.org/book/regions.arch.html#compaction)
+
+4. Should timestamps be used for row keys in HBase? Why or why not? (3pts)
+
+Timestamps alone should not be used as row keys because timestamps are monotonically increasing and may not evenly distribute the load accross all nodes in a region. Also, all data cells have an associated timestamp, so the row key timestamp may not be neccessary.
+
+To mitigate this issue, the timestamp should be appended to a natural random value. Because the row keys are distributed based on the sort order (first bytes of the row key), the timestamp will no longer affect the distribution.
+
+(http://hbase.apache.org/book/rowkey.design.html)
+
+5. HBase is a NOSQL database which means it does not operate like an RDBMS. When would a person want to use HBase instead of a traditional RDMBS? (3pts)
+
+HBase is much better suited for applications that must scale to large amounts of data. RDMBS are limited to expensive scaling solitions. Also, HBase is suited for users who do not require complex join queries, but instead can operate with a key/value/scan type of model and perform joins at the application layer.
+
+6. How does the HBase client HTable find RegionServers? (1pt)
+
+There's an API call, getRegioinLocation that clients can use to identify the region server. The hbase LoadBalancer is used to evenly distribute regions accross a cluster and to map clients to the appropriate region.
+
+(http://hbase.apache.org/apidocs/org/apache/hadoop/hbase/client/HTable.html#getRegionLocation%28byte[]%29)
+(http://hbase.apache.org/book/master.html#master.processes.loadbalancer)
+
+7. What happens during a minor compaction? (3pts)
+
+A minor compaction may combine one or more StoreFiles into one store file. It does not remove any tombstones (deleted rows).
 
