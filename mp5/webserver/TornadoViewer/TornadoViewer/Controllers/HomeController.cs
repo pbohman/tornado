@@ -18,25 +18,66 @@ namespace CassandraViewer.Controllers
 {
     public class HomeController : Controller
     {
-        /*
+        [HttpPost]
+        public ActionResult Index(string TimeStart, string TimeEnd)
+        {
+            Highcharts chart = BuildRateChart();
+
+            DateTime dtStart;
+            DateTime dtEnd;
+
+            if (!DateTime.TryParse(TimeStart, out dtStart))
+            {
+                dtStart = DateTime.MinValue;
+            }
+
+            if (!DateTime.TryParse(TimeEnd, out dtEnd))
+            {
+                dtEnd = DateTime.MaxValue;
+            }
+
+            chart.SetSeries(CassandraViewer.Models.MetricRate.GetData(dtStart, dtEnd));
+
+            return View(chart);
+         }
+
+        [HttpGet]
         public ActionResult Index()
         {
-            ViewBag.Message = "Modify this template to jump-start your ASP.NET MVC application.";
+            Highcharts chart = BuildRateChart();
 
+            chart.SetSeries(CassandraViewer.Models.MetricRate.GetData(DateTime.MinValue, DateTime.MaxValue));
+            
+            return View(chart);
+        }
+
+        public ActionResult Burst()
+        {
+            Highcharts chart = BuildBurstChart();
+
+            chart.SetSeries(CassandraViewer.Models.MetricBurst.GetData(DateTime.MinValue.Ticks, DateTime.MaxValue.Ticks));
+
+            return View(chart);
+        }
+
+        public ActionResult Abstract()
+        {
             return View();
         }
-        */
-        public ActionResult Index()
+
+        public Highcharts BuildRateChart()
         {
-
-
             Highcharts chart = new Highcharts("rate")
-                .InitChart(new Chart { DefaultSeriesType = ChartTypes.Spline })
+                .InitChart(new Chart { 
+                    ZoomType = ZoomTypes.X, 
+                    DefaultSeriesType = ChartTypes.Spline 
+                })
                 .SetOptions(new GlobalOptions { Global = new Global { UseUTC = false } })
                 .SetTitle(new Title { Text = "Packets per destination addresses" })
                 .SetSubtitle(new Subtitle { Text = "Storm-aggregated metrics" })
                 .SetXAxis(new XAxis
                 {
+                    MinRange = 1,
                     Type = AxisTypes.Datetime,
                     TickmarkPlacement = Tickmarks.On,
                 })
@@ -62,21 +103,23 @@ namespace CassandraViewer.Controllers
                                            }*/
                                 })
             ;
-            chart.SetSeries(CassandraViewer.Models.MetricRate.GetData(DateTime.MinValue.Ticks, DateTime.MaxValue.Ticks));
 
-            return View(chart);
+            return chart;
         }
 
-        public ActionResult Burst()
+        public Highcharts BuildBurstChart()
         {
-
             Highcharts chart = new Highcharts("burst")
-                .InitChart(new Chart { DefaultSeriesType = ChartTypes.Spline })
+                .InitChart(new Chart {
+                    ZoomType = ZoomTypes.X,
+                    DefaultSeriesType = ChartTypes.Spline
+                })
                 .SetOptions(new GlobalOptions { Global = new Global { UseUTC = false } })
-                .SetTitle(new Title { Text = "Sources per destination addresses per second" })
+                .SetTitle(new Title { Text = "Sources per destination addresses" })
                 .SetSubtitle(new Subtitle { Text = "Storm-aggregated metrics" })
                 .SetXAxis(new XAxis
                 {
+                    MinRange = 1,
                     Type = AxisTypes.Datetime,
                     TickmarkPlacement = Tickmarks.On,
                 })
@@ -102,14 +145,8 @@ namespace CassandraViewer.Controllers
                            }*/
                 })
             ;
-            chart.SetSeries(CassandraViewer.Models.MetricBurst.GetData(DateTime.MinValue.Ticks, DateTime.MaxValue.Ticks));
 
-            return View(chart);
-        }
-
-        public ActionResult Abstract()
-        {
-            return View();
+            return chart;
         }
     }
 }

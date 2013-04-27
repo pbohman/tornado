@@ -31,7 +31,7 @@ namespace CassandraViewer.Models
         public int icmp { get; set; }
 
 
-        public static Series[] GetData(long start, long end)
+        public static Series[] GetData(DateTime start, DateTime end)
         {
             DateTime unixEpoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
@@ -52,15 +52,15 @@ namespace CassandraViewer.Models
             var query = collection.AsQueryable<MetricRate>();
             var categories = query.Select(x => x.Hostname).Distinct();
 
-            var dtStart = (start == DateTime.MinValue.Ticks) ? query.Min(x => x.Timestamp) : start;
-            var dtEnd = (end == DateTime.MinValue.Ticks) ? query.Max(x => x.Timestamp) : end;
+            var longStart = (start == DateTime.MinValue) ? query.Min(x => x.Timestamp) : (long) start.Subtract(unixEpoch).TotalSeconds;
+            var longEnd = (end == DateTime.MaxValue) ? query.Max(x => x.Timestamp) : (long) end.Subtract(unixEpoch).TotalSeconds;
 
             List<Series> series = new List<Series>();
 
             foreach (var c in categories)
             {
                 var q = query
-                    .Where(x => x.Hostname.Equals(c) && x.Timestamp >= dtStart && x.Timestamp <= dtEnd).ToArray();
+                    .Where(x => x.Hostname.Equals(c) && x.Timestamp >= longStart && x.Timestamp <= longEnd).ToArray();
 
                 var g = q.GroupBy(a => a.Timestamp)
                     .Select(y =>
