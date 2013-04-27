@@ -295,6 +295,7 @@
     <Content Include="Views\Web.config" />
     <Content Include="Views\Demo\BasicLine.cshtml" />
     <Content Include="Views\Demo\AjaxLoad.cshtml" />
+    <Content Include="Views\Home\Burst.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
