@@ -1,0 +1,61 @@
+﻿@{
+    ViewBag.Title = "Abstract";
+}
+
+<hgroup class="title">
+    <h1>@ViewBag.Title.</h1>
+    <h2>@ViewBag.Message</h2>
+</hgroup>
+
+<article>
+
+    <h3>Introduction</h3>
+
+    <p>
+        A distributed denial-of-service attack (DDoS attack) is an attempt to make a machine or network resource unavailable to its intended user. Attack methods generally include consumption of computational resources, such as bandwidth disk space or processor time; disruption of configuration information, such as routing information; or even disruption of physical components such as disconnecting media components. The most common of these DDoS attack methods and the one that this project focuses on is the saturation of a computational resource hosted on the internet by an attacker that prevents legitimate users from accessing the hosted resource. 
+    </p>
+
+    <p>
+        Attackers target web applications on the internet for a number of reasons including political motives, fame, and even social vigilantism. Regardless of the attack motivation, when a business that relies on its web presence for revenue or delivery of a critical service is targeted by a DDoS attack, the end result can be devastating. To mitigate the risk associated with DDoS attacks, companies employ firewalls, traffic filters, rate limiters and other technologies that attempt to protect their resources from DDoS attacks. These approaches work to some degree but generally suffer from false positives or a low detection rate. The lack of performance can normally be attributed to insufficient processing power, the inability to distinguish between flash crowds and DDoS attacks, and static or slow to evolve rules that are unable to keep up with the rapid pace attackers are able to change their methodology.
+    </p>
+
+    <p>
+        Our project aims to improve the current state of DDoS detection by leveraging the recent advances in real-time stream processing. The current stream processing frameworks allow solutions to scale to very large data sets while still maintaining real-time processing speeds. Real time processing, compared to batch processing that is widely map reduce frameworks, is critical in keeping up with the velocity of the data entering a DDoS detection system. In addition, real time processing is important in DDoS detection due to the increased damage inflected by the attack as the detection delay increases. Rather than focus on the DDoS statistical models, we plan to focus on implementing and measuring a distributed packet processing system that is geared towards DDoS detection. We believe this is the first project that aims to implement and measure the effectiveness of a DDoS detection tool using a distributed set of commodity computers. Thus, the fundamental challenges of this project include:
+    </p>
+
+    <ul>
+        <li>Processing large number of packets that enter a network and aggregating the information in near real-time</li>
+        <li>Measuring the horizontal-scalability of our packet processing system in terms of packet throughput</li>
+        <li>Storing and visualizing the aggregated data</li>
+    </ul>
+
+    <h3>Design</h3>
+    
+    <p>
+        Our design of a DDoS detection system can be split into 4 separate components:
+    </p>
+
+   <ul>
+        <li><b>Packet data feed and queuing component.</b> Our approach assumes that the existing network infrastructure is capable producing network captures that represent and random sample of the underlying traffic transiting the network. These captures will then be fed into a distributed in memory queue before they are processed by our packet processing component.</li>
+        <li><b>Packet processing component.</b> The packet processing component is responsible for efficiently aggregating informatino from the packets transiting the network with the aim of detecting the presence of DDoS attacks. In favor of time, this portion of the project will leverage some of the more trivial DDoS detection mechanisms that have already been widely studied. These mechanisms include throughput and source ip distribution anomalies. We will instead focus on improving and measuring the scalability of this component. </li>
+        <li><b>Aggregation data store.</b> The aggregated data store is responsible for storing the aggregated statistics produced by the packet processing system and serving requests from the data visualization component for this data.</li>
+        <li><b>Data visualization.</b> This component is designed as a web service that network operators can access to quickly view the real-time aggregations provided by the packet processing component. </li>
+    </ul>
+
+    <h3>Implementation</h3>
+
+    <p>
+        We plan to utilize the storm framework for our packet processing. The storm framework provides a distributed and fault-tolerant realtime, continuous, stream computation framework that is capable of scaling horizontally.  We plan to first implement and test our algorithms on a single machine and then test the scalability of our solution by introducing larger data sets and adding more machines. The DDoS detection statistics we've chosen to implement include traffic throughput rates and fluctuations in observed unique ip addresses. These measurements were chosen based off of the applicability to DDoS detection, which is documented in other research papers, and their relatively low computational over head. 
+    </p>
+
+    <p>
+        We plan to store the aggregated packet measurements in a MongoDB database. The visualization web app will then communicate with the MongoDB database to update a real-time display of the aggregated statistics. A MongoDB database was chosen due to its extensible document-storage data model that allows for dynamic querying and vendor support for a vast array of data layer drivers. 
+    </p>
+</article>
+
+<aside>
+    <h3>Links</h3>
+    <ul>
+        <li><a href="https://wiki.engr.illinois.edu/display/cs498cc/Tornado+-+DDoS+Detection+using+Storm">Official Project Page</a>)</li>
+    </ul>
+</aside>

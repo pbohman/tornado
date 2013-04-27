@@ -1,0 +1,16 @@
+﻿@model DotNet.Highcharts.Highcharts
+@{
+    ViewBag.Title = "Visualization";
+}
+@(Model)
+
+$(function(){
+    $('#test-1').timepickr({
+        handle: '#trigger-test'
+        convention: 12 });
+});
+
+
+<input id="timestart" type="text" value="00:00" />
+
+<input id="timeend" type="text" value="00:00" />
