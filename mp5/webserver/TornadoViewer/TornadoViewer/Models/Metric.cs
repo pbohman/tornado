@@ -81,7 +81,6 @@ namespace CassandraViewer.Models
     public class MetricBurst
     {
         public ObjectId Id { get; set; }
-        public string Hostname { get; set; }
         public long Timestamp { get; set; }
         public int Value { get; set; }
 
