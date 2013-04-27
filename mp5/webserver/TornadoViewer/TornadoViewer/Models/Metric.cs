@@ -95,39 +95,29 @@ namespace CassandraViewer.Models
             if (settings != null)
                 connectionString = settings.ConnectionString;
 
-
-
             var client = new MongoClient(connectionString);
             var server = client.GetServer();
             var database = server.GetDatabase(ConfigurationManager.AppSettings["MongoDatabase"]);
             var collection = database.GetCollection<MetricRate>(ConfigurationManager.AppSettings["MongoCollectionBurst"]);
 
-            var query = collection.AsQueryable<MetricRate>();
-            var categories = query.Select(x => x.Hostname).Distinct();
+            var query = collection.AsQueryable<MetricBurst>();
 
             var dtStart = (start == DateTime.MinValue.Ticks) ? query.Min(x => x.Timestamp) : start;
             var dtEnd = (end == DateTime.MinValue.Ticks) ? query.Max(x => x.Timestamp) : end;
 
-            List<Series> series = new List<Series>();
+            var q = query
+                .Where(x => x.Timestamp >= dtStart && x.Timestamp <= dtEnd).ToArray();
 
-            foreach (var c in categories)
-            {
-                var q = query
-                    .Where(x => x.Hostname.Equals(c) && x.Timestamp >= dtStart && x.Timestamp <= dtEnd).ToArray();
+            var g = q.GroupBy(a => a.Timestamp)
+                .Select(y =>
+                            new object[] 
+                            { 
+                                new DateTime(unixEpoch.Ticks).AddSeconds((double) y.Key).ToLocalTime(), 
+                                y.Sum(z => z.Value)
+                            }
+                        );
 
-                var g = q.GroupBy(a => a.Timestamp)
-                    .Select(y =>
-                                new object[] 
-                                { 
-                                    new DateTime(unixEpoch.Ticks).AddSeconds((double) y.Key).ToLocalTime(), 
-                                    y.Sum(z => z.Value)
-                                }
-                            );
-
-                series.Add(new Series { Name = c, Data = new Data(g.ToArray()) });
-            }
-
-            return series.ToArray();
+            return new Series[] { new Series { Name = "DDOS", Data = new Data(g.ToArray()) } };
         }
     }
 }
