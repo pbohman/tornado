@@ -70,7 +70,7 @@ namespace CassandraViewer.Controllers
             Highcharts chart = new Highcharts("rate")
                 .InitChart(new Chart { 
                     ZoomType = ZoomTypes.X, 
-                    DefaultSeriesType = ChartTypes.Spline 
+                    DefaultSeriesType = ChartTypes.Spline
                 })
                 .SetOptions(new GlobalOptions { Global = new Global { UseUTC = false } })
                 .SetTitle(new Title { Text = "Packets per destination addresses" })
@@ -89,7 +89,7 @@ namespace CassandraViewer.Controllers
                 .SetTooltip(new Tooltip { Formatter = "function() { return '<b>'+ this.series.name +'</b><br>'+ Highcharts.dateFormat('%m/%d/%y', this.x) +'<br>'+ Highcharts.dateFormat('%H:%M:%S', this.x) +'<br><b>'+ this.y +'</b>'; }" })
                 .SetPlotOptions(new PlotOptions
                                 {
-                                    /*
+                                    ///*
                                     Area = new PlotOptionsArea
                                            {
                                                Stacking = Stackings.Normal,
@@ -100,7 +100,8 @@ namespace CassandraViewer.Controllers
                                                             LineWidth = 1,
                                                             LineColor = ColorTranslator.FromHtml("#666666")
                                                         }
-                                           }*/
+                                           }
+                                     //*/
                                 })
             ;
 
@@ -131,7 +132,7 @@ namespace CassandraViewer.Controllers
                 .SetTooltip(new Tooltip { Formatter = "function() { return '<b>'+ this.series.name +'</b><br>'+ Highcharts.dateFormat('%m/%d/%y', this.x) +'<br>'+ Highcharts.dateFormat('%H:%M:%S', this.x) +'<br><b>'+ this.y +'</b>'; }" })
                 .SetPlotOptions(new PlotOptions
                 {
-                    /*
+                    ///*
                     Area = new PlotOptionsArea
                            {
                                Stacking = Stackings.Normal,
@@ -142,7 +143,8 @@ namespace CassandraViewer.Controllers
                                             LineWidth = 1,
                                             LineColor = ColorTranslator.FromHtml("#666666")
                                         }
-                           }*/
+                           }
+                     //*/
                 })
             ;
 
