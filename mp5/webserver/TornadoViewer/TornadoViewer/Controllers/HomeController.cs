@@ -86,7 +86,7 @@ namespace CassandraViewer.Controllers
                     Title = new XAxisTitle { Text = "Packets" },
                     Min = 0
                 })
-                .SetTooltip(new Tooltip { Formatter = "function() { return '<b>'+ this.series.name +'</b><br/>'+ Highcharts.dateFormat('%F %n %F', this.x) +': '+ this.y +''; }" })
+                .SetTooltip(new Tooltip { Formatter = "function() { return '<b>'+ this.series.name +'</b><br>'+ Highcharts.dateFormat('%m/%d/%y', this.x) +'<br>'+ Highcharts.dateFormat('%H:%M:%S', this.x) +'<br><b>'+ this.y +'</b>'; }" })
                 .SetPlotOptions(new PlotOptions
                                 {
                                     /*
@@ -128,7 +128,7 @@ namespace CassandraViewer.Controllers
                     Title = new XAxisTitle { Text = "Unique IPs" },
                     Min = 0
                 })
-                .SetTooltip(new Tooltip { Formatter = "function() { return '<b>'+ this.series.name +'</b><br/>'+ Highcharts.dateFormat('%F %n %F', this.x) +': '+ this.y +''; }" })
+                .SetTooltip(new Tooltip { Formatter = "function() { return '<b>'+ this.series.name +'</b><br>'+ Highcharts.dateFormat('%m/%d/%y', this.x) +'<br>'+ Highcharts.dateFormat('%H:%M:%S', this.x) +'<br><b>'+ this.y +'</b>'; }" })
                 .SetPlotOptions(new PlotOptions
                 {
                     /*
