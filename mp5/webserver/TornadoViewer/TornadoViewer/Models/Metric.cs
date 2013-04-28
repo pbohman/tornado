@@ -60,7 +60,9 @@ namespace CassandraViewer.Models
             foreach (var c in categories)
             {
                 var q = query
-                    .Where(x => x.Hostname.Equals(c) && x.Timestamp >= longStart && x.Timestamp <= longEnd).ToArray();
+                    .Where(x => x.Hostname.Equals(c) && x.Timestamp >= longStart && x.Timestamp <= longEnd)
+                    .OrderBy(x => x.Timestamp)
+                    .ToArray();
 
                 var g = q.GroupBy(a => a.Timestamp)
                     .Select(y =>
@@ -106,7 +108,9 @@ namespace CassandraViewer.Models
             var dtEnd = (end == DateTime.MinValue.Ticks) ? query.Max(x => x.Timestamp) : end;
 
             var q = query
-                .Where(x => x.Timestamp >= dtStart && x.Timestamp <= dtEnd).ToArray();
+                .Where(x => x.Timestamp >= dtStart && x.Timestamp <= dtEnd)
+                .OrderBy(x => x.Timestamp)
+                .ToArray();
 
             var g = q.GroupBy(a => a.Timestamp)
                 .Select(y =>
