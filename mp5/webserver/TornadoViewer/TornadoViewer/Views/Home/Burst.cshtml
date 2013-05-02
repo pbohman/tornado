@@ -1,0 +1,17 @@
+﻿@model DotNet.Highcharts.Highcharts
+@{
+    ViewBag.Title = "IP Burst";
+}
+@(Model)
+
+
+<script type="text/javascript">
+        $(document).ready(function() {
+            $('#ButtonRefresh').click(function () {
+                location.reload();
+            });
+        });     
+</script>
+
+
+<input id="ButtonRefresh" type="button" value="Refresh" />

@@ -1,0 +1,17 @@
+﻿@model DotNet.Highcharts.Highcharts
+@{
+    ViewBag.Title = "Packet Rate";
+}
+@(Model)
+
+
+<script type="text/javascript">
+        $(document).ready(function() {
+            $('#ButtonRefresh').click(function () {
+                location.reload();
+            });
+        });     
+</script>
+
+
+<input id="ButtonRefresh" type="submit" value="Refresh" /> 
