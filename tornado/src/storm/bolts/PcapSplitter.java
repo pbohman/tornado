@@ -123,7 +123,6 @@ public class PcapSplitter implements IRichBolt{
 		
 		if (TupleHelpers.isTickTuple(tuple)) {
 			System.out.println();
-			//collector.ack(tuple);
 			return;
 		}
 		Pcap pcap = null;
@@ -133,22 +132,14 @@ public class PcapSplitter implements IRichBolt{
 			data = loadPcap(tuple.getBinary(0));
 			pcap = Pcap.openOffline(data.getAbsolutePath(), errbuf);
 			System.out.println("Starting packet loop");
-			//pcap.loop(Pcap.LOOP_INFINITE, handler, collector);
 			pcap.loop(Pcap.LOOP_INFINITE, handler, collector);  
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
         finally {  
-        /*************************************************************************** 
-         * Last thing to do is close the pcap handle 
-         **************************************************************************/ 
         	if(pcap != null)pcap.close();
         	if(data != null)data.delete();
-        	//collector.ack(tuple);
         }  
-		
-        //System.out.println("OUTPUT TUPLE:" + tuple);
     }
 
     @Override

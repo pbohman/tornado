@@ -2,22 +2,15 @@ package storm.bolts;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.Map.Entry;
 
-import org.jnetpcap.PcapHeader;
-import org.jnetpcap.nio.JMemory.Type;
-import org.jnetpcap.packet.JHeaderPool;
-import org.jnetpcap.packet.PcapPacket;
-import org.jnetpcap.packet.PeeringException;
-import org.jnetpcap.protocol.network.Icmp;
-import org.jnetpcap.protocol.network.Ip4;
-import org.jnetpcap.protocol.tcpip.Tcp;
 
-import storm.util.TupleHelpers;
+import org.jnetpcap.nio.JMemory.Type;
+import org.jnetpcap.packet.PcapPacket;
+import org.jnetpcap.protocol.network.Ip4;
 
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
@@ -26,10 +19,12 @@ import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 import backtype.storm.tuple.Values;
 import backtype.storm.topology.IRichBolt;
+
 import com.google.common.hash.BloomFilter;
 import com.google.common.hash.Funnel;
 import com.google.common.hash.PrimitiveSink;
 
+import storm.util.TupleHelpers;
 
 
 
@@ -42,6 +37,16 @@ public class IPBolt implements IRichBolt{
 	private static int NUM_FILTER_ITEMS = 8000000;
 	private static double FALSE_POS_RATE = 0.15;
 	private Map<Long, Integer> newIPRate;
+	
+	public static byte[] unpack_ip(int bytes) {
+		  return new byte[] {
+		    (byte)((bytes >>> 24) & 0xff),
+		    (byte)((bytes >>> 16) & 0xff),
+		    (byte)((bytes >>>  8) & 0xff),
+		    (byte)((bytes       ) & 0xff)
+		  };
+	}
+
 
 	@Override
 	public void declareOutputFields(OutputFieldsDeclarer declarer) {
@@ -49,18 +54,16 @@ public class IPBolt implements IRichBolt{
 		declarer.declareStream("ipSrcStats", new Fields("timestamp", "value"));
 	}
 
+	@SuppressWarnings("serial")
 	@Override
 	public void prepare(Map stormConf, TopologyContext context, OutputCollector collector) {
 		this.collector = collector;
 		
-		ip = new Ip4(); // Preallocat IP version 4 header
-		
-		// dstIP tracking
+		ip = new Ip4(); 
 		dstIpStats = new HashMap<String, Map<Long, int[]>>();
 		
 		// Unique src IP tracking
 		Funnel<String> ipFunnel = new Funnel<String>() {
-			private static final long serialVersionUID = 1L;
 
 			@Override
 			  public void funnel(String ip, PrimitiveSink into) {
@@ -72,16 +75,8 @@ public class IPBolt implements IRichBolt{
 		newIPRate = new TreeMap<Long, Integer>();
 	}
 	
-	public byte[] unpack(int bytes) {
-		  return new byte[] {
-		    (byte)((bytes >>> 24) & 0xff),
-		    (byte)((bytes >>> 16) & 0xff),
-		    (byte)((bytes >>>  8) & 0xff),
-		    (byte)((bytes       ) & 0xff)
-		  };
-	}
 
-	public void statSrcIP(long sec, String src){
+	private void statSrcIP(long sec, String src){
 		if(!observedIPs.mightContain(src)){
 			Integer rate = newIPRate.get(sec);
 			if (rate == null) rate = new Integer(0);
@@ -91,11 +86,11 @@ public class IPBolt implements IRichBolt{
 		}
 	}
 	
-	public void statIP(long sec, PcapPacket p, String src) throws UnknownHostException{
+	private void statIP(long sec, PcapPacket p, String src) throws UnknownHostException{
 		if (p.hasHeader(ip)) {
 
 			int dstInt = ip.destinationToInt();
-			String dst = InetAddress.getByAddress(unpack(dstInt)).getHostAddress();
+			String dst = InetAddress.getByAddress(unpack_ip(dstInt)).getHostAddress();
 			int protocol = ip.type();
 			int len = ip.length();
 			
@@ -103,7 +98,7 @@ public class IPBolt implements IRichBolt{
 			Map<Long, int[]> intervalStats = (Map<Long, int[]>) dstIpStats.get(dst);
 			if(intervalStats==null) intervalStats = new TreeMap<Long, int[]>();
 			
-			// Get values for this time
+			// Update interval stats
 			int[] values = intervalStats.get(sec);
 			if(values==null) values = new int[5];
 			values[0] += 1;
@@ -123,7 +118,7 @@ public class IPBolt implements IRichBolt{
 		}
 	}
 	
-	public void dumpDstStats(){
+	private void dumpDstStats(){
 		for (Entry<String, Map<Long, int[]>> entry : dstIpStats.entrySet())
 		{
 			String ip = entry.getKey();
@@ -138,7 +133,7 @@ public class IPBolt implements IRichBolt{
 		return;
 	}
 	
-	public void dumpSrcStats(){
+	private void dumpSrcStats(){
 		for (Entry<Long, Integer> entry : newIPRate.entrySet()){
 			System.out.println(entry.getKey() + ": " + entry.getValue());
 			this.collector.emit("ip_src_stats", new Values(entry.getKey(), entry.getValue()));
